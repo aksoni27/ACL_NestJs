@@ -1,14 +1,17 @@
 /* eslint-disable prettier/prettier */
 import { CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { Roles } from 'src/decorator/roles.decorator';
 
 export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    console.log(context);
+    console.log(Roles);
 
-    const roles = this.reflector.get<string[]>('roles', context.getHandler());
+    const roles = this.reflector.get(Roles, 
+      context.getHandler(),
+    );
 
     if (!roles || roles.length === 0) {
       return true; // no specific role required , allowed access

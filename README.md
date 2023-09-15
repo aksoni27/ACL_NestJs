@@ -70,4 +70,10 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 
 ## License
 
+
+## 
+Interview thoughts
+- Due to being time constraint I was not able to write to put role in db and , also 
+ some part of the code left to handle exceptional handling
+
 Nest is [MIT licensed](LICENSE).
