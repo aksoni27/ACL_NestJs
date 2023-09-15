@@ -28,10 +28,8 @@ export class AuthController {
   @Post('login')
   async login(@Body() body: any, @Res() res) {
     try {
-      await this.authService.login(body);
-      return res.status(HttpStatus.OK).json({
-        message: 'Login successfull',
-      });
+      const response = await this.authService.login(body);
+      return res.status(HttpStatus.OK).send(response);
     } catch (err) {
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         message: err?.message,

@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Injectable, UsePipes, ValidationPipe } from '@nestjs/common';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { User } from './entities/user.entity';
@@ -24,7 +25,7 @@ export class UserService {
   }
 
   findAll() {
-    return `This action returns all user`;
+    return this.userRepository.find()
   }
 
   findOne(id: number) {

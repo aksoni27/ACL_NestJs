@@ -1,13 +1,20 @@
-import { Injectable, UsePipes, ValidationPipe } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { User } from 'src/user/entities/user.entity';
 import { CreateUserDto } from 'src/dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
+    private jwtService: JwtService,
   ) {}
 
   @UsePipes(new ValidationPipe())
@@ -33,20 +40,16 @@ export class AuthService {
     return response;
   }
 
-  async validateUser(username: string, passWord: string) {
-    const user = await this.findUserByUserName(username);
-    if (!user) {
-      throw new Error('UserDoesNotExist');
-    }
-    if (user.password !== passWord) {
-      throw new Error('wrong password');
-    }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...result } = user;
-    return result;
-  }
 
   async login(user: any) {
-    return await this.validateUser(user.username, user.password);
+    const dbuser = await this.findUserByUserName(user.username);
+    if (dbuser?.password !== user.password) {
+      throw new UnauthorizedException();
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const payload = { sub: user.username, username: user.username };
+    return {
+      access_token: await this.jwtService.signAsync(payload),
+    };
   }
 }
