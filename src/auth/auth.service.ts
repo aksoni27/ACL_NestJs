@@ -1,6 +1,6 @@
 import { Injectable, UsePipes, ValidationPipe } from '@nestjs/common';
 import { User } from 'src/user/entities/user.entity';
-import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { CreateUserDto } from 'src/dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -9,6 +9,7 @@ export class AuthService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
+
   @UsePipes(new ValidationPipe())
   async signup(createUserDto: CreateUserDto) {
     try {
@@ -28,23 +29,24 @@ export class AuthService {
     }
   }
   async findUserByUserName(username: string) {
-    console.log(username);
-    const response= await this.userRepository.findOne({ where: { username } });
-    console.log(response);
+    const response = await this.userRepository.findOne({ where: { username } });
     return response;
   }
 
-  async validateUser(username: string, password: string) {
+  async validateUser(username: string, passWord: string) {
     const user = await this.findUserByUserName(username);
-    if (user && user.password === password) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, ...result } = user;
-      return result;
+    if (!user) {
+      throw new Error('UserDoesNotExist');
     }
-    return 'User invalid or wrong password';
+    if (user.password !== passWord) {
+      throw new Error('wrong password');
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...result } = user;
+    return result;
   }
 
   async login(user: any) {
-    return this.validateUser(user.username, user.password);
+    return await this.validateUser(user.username, user.password);
   }
 }

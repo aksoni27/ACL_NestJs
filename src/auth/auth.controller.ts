@@ -1,21 +1,10 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  Res,
-  HttpStatus,
-} from '@nestjs/common';
+import { Controller, Post, Body, Res, HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { CreateUserDto } from 'src/dto/create-user.dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
-
   @Post('signup')
   async signup(@Body() createUserDto: CreateUserDto, @Res() res) {
     try {
@@ -37,7 +26,16 @@ export class AuthController {
   }
 
   @Post('login')
-  async login(@Body() body: any) {
-    this.authService.login(body);
+  async login(@Body() body: any, @Res() res) {
+    try {
+      await this.authService.login(body);
+      return res.status(HttpStatus.OK).json({
+        message: 'Login successfull',
+      });
+    } catch (err) {
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        message: err?.message,
+      });
+    }
   }
 }
